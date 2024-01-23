@@ -56,7 +56,7 @@ After the tests have finished, generate and serve Allure report:
 ```bash
 allure serve
 ```
-Here is the link that showing quick demo: [https://youtu.be/xml3puwgnhI ](https://youtu.be/xml3puwgnhI)
+Here is the link that showing quick demo: https://youtu.be/QjH8ORG5mRM 
 
 Open the generated URL in your browser to view the detailed test report.
 
