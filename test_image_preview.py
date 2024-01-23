@@ -8,6 +8,8 @@ import allure
 from helper import ImageComparisonUtil, PreviewApp
 
 
+@allure.parent_suite("Tests for Desktop UI Auth")
+@allure.step("Setting up by instanting webdriver and teardown")
 @pytest.fixture(scope="session")
 def preview_app(request):
     options = Mac2Options()
