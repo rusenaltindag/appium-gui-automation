@@ -18,10 +18,10 @@ class ImageComparisonUtil:
         print(f"Logging in with username: {self.img1} and password: {self.img2}")
 
     def compareWithImageHash(self):
-        img2_resized = self.img2.resize(self.img1.size)
+        self.img2 = self.img2.resize(self.img1.size)
 
         img1_hash = imagehash.average_hash(self.img1)
-        img2_hash = imagehash.average_hash(img2_resized)
+        img2_hash = imagehash.average_hash(self.img2)
 
         img_diff = Image.new("RGBA", self.img1.size)
         pixelmatch(self.img1, self.img2, img_diff)
