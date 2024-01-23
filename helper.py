@@ -55,6 +55,12 @@ class IOHelper:
     def __init__(self):
         pass
 
+    def getFullPathNameOfImage(self, image_name, searchDirectory):
+        if searchDirectory == "base_image":
+            return os.path.join(os.getcwd, "base_image", image_name)
+        else:
+            return os.path.join(os.getcwd, "output", image_name)
+
 
 class PreviewApp:
     def __init__(self, driver):
@@ -123,3 +129,22 @@ class PreviewApp:
             "macos:keys",
             {"keys": ["XCUIKeyboardKeyEnter"]},
         )
+
+    def ScreenShotThePreview(self, ss_name):
+        self.driver.find_element(
+            by=AppiumBy.CLASS_NAME, value="XCUIElementTypeImage"
+        ).screenshot(ss_name)
+
+    def GetAppState(self):
+        # https://developer.apple.com/documentation/xctest/xcuiapplicationstate?language=objc
+        return (
+            "Running"
+            if self.driver.execute_script(
+                "macos: queryAppState", {"bundleId": "com.apple.Preview"}
+            )
+            == 4
+            else "Not Running"
+        )
+
+    def TearDown(self):
+        self.driver.quit()
