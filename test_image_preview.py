@@ -14,6 +14,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 
 import allure
 from allure import attachment_type
+from helper import ImageComparisonUtil
 
 
 @pytest.fixture(scope="session")
@@ -26,6 +27,14 @@ def driver(request):
         if file_name.endswith(".png") or file_name.endswith(".jpg"):
             os.remove(os.path.join(file_name))
     drv.quit()
+
+
+def test_rusen(driver):
+    img1 = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_1.png"))
+    img2 = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_2.png"))
+
+    img_comparison = ImageComparisonUtil(img1, img2)
+    assert img_comparison.compareWithPixelMatch() == 0
 
 
 @allure.title(
@@ -80,43 +89,21 @@ def test_preview_of_image_with_original_with_pixel_match(driver):
     original_img = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_1.png"))
     preview_img = Image.open("IMAGE_1_preview_ss_class_name.png")
 
-    preview_img = preview_img.resize(original_img.size)
-    img_diff = Image.new("RGBA", original_img.size)
-    mismatch = pixelmatch(original_img, preview_img, img_diff)
-    img_diff.save("original_vs_preview_diff.png")
-    if mismatch > 0:
-        allure.attach.file(
-            "original_vs_preview_diff.png",
-            name="Differences between Preview and Original IMG",
-            attachment_type=attachment_type.PNG,
-        )
-    assert mismatch == 0
+    img_comparison = ImageComparisonUtil(original_img, preview_img)
+
+    assert img_comparison.compareWithPixelMatch() == 0
 
 
-@pytest.mark.image
 @allure.title(
     "Verify with image comparison that the imported Image looks correctly in the Image Editor - imagehash approach"
 )
 def test_preview_of_image_with_original_with_hash(driver):
     original_img = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_1.png"))
     preview_img = Image.open("IMAGE_1_preview_ss_class_name.png")
-    preview_img = preview_img.resize(original_img.size)
 
-    original_img_hash = imagehash.average_hash(original_img)
-    preview_img_hash = imagehash.average_hash(preview_img)
+    img_comparison = ImageComparisonUtil(original_img, preview_img)
 
-    img_diff = Image.new("RGBA", original_img.size)
-    pixelmatch(original_img, preview_img, img_diff)
-    img_diff.save("original_vs_preview_diff_with_imagehash.png")
-    allure.attach.file(
-        "original_vs_preview_diff_with_imagehash.png",
-        name="Differences between Preview and Original IMG",
-        attachment_type=attachment_type.PNG,
-    )
-    similarity = (
-        1 - (original_img_hash - preview_img_hash) / len(original_img_hash.hash) ** 2
-    )
-    assert similarity == 1.0
+    assert img_comparison.compareWithImageHash() == 1.0
 
 
 @allure.title("Export the Image in JPG format to a local drive")
@@ -164,7 +151,7 @@ def test_verify_that_the_exported_image_exists(driver):
 
 
 @allure.title(
-    "Verify with image comparison whether the exported image is equal to IMAGE_2"
+    "Verify with image comparison whether the exported image is equal to IMAGE_2 - pixelmatch"
 )
 def test_verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMAGE_2(
     driver,
@@ -172,32 +159,18 @@ def test_verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMA
     img1 = Image.open("IMAGE_1.jpg")
     img2 = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_2.png"))
 
-    img_diff = Image.new("RGBA", img1.size)
-    mismatch = pixelmatch(img1, img2, img_diff)
-    img_diff.save("IMAGE_1_diff.png")
-    allure.attach.file(
-        "IMAGE_1_diff.png",
-        name="Differences between IMG1 and IMG2",
-        attachment_type=attachment_type.PNG,
-    )
-    assert mismatch == 0
+    img_comparison = ImageComparisonUtil(img1, img2)
+    assert img_comparison.compareWithPixelMatch() == 0
 
 
 @allure.title(
     "Verify with image comparison whether the exported image is equal to IMAGE_2 - imagehash"
 )
-def test_verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMAGE_2(
+def test_verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMAGE_2_image_hash(
     driver,
 ):
     img1 = Image.open("IMAGE_1.jpg")
     img2 = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_2.png"))
 
-    img_diff = Image.new("RGBA", img1.size)
-    mismatch = pixelmatch(img1, img2, img_diff)
-    img_diff.save("IMAGE_1_diff.png")
-    allure.attach.file(
-        "IMAGE_1_diff.png",
-        name="Differences between IMG1 and IMG2",
-        attachment_type=attachment_type.PNG,
-    )
-    assert mismatch == 0
+    img_comparison = ImageComparisonUtil(img1, img2)
+    assert img_comparison.compareWithImageHash() == 1.0
