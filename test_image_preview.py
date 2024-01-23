@@ -80,7 +80,7 @@ def test_import_image(driver):
             ]
         },
     )
-    image_path = os.path.join(os.getcwd(), "IMAGE_1.png")
+    image_path = os.path.join(os.getcwd(), "base_images", "IMAGE_1.png")
     driver.execute_script(
         "macos:keys",
         {"keys": [*image_path, "XCUIKeyboardKeyEnter", "XCUIKeyboardKeyEnter"]},
@@ -94,7 +94,7 @@ def test_import_image(driver):
     "Verify with image comparison that the imported Image looks correctly in the Image Editor"
 )
 def test_preview_of_image_with_original(driver):
-    original_img = Image.open("IMAGE_1.png")
+    original_img = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_1.png"))
     preview_img = Image.open("IMAGE_1_preview_ss_class_name.png")
 
     preview_img = preview_img.resize(original_img.size)
@@ -118,11 +118,23 @@ def test_export_func(driver):
         by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Export…'"
     ).click()
 
-    # Select Name Section
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE,
-        value="elementType == 49 AND identifier == 'saveAsNameTextField'",
-    ).click()
+    flagsShift = (1 << 1) | (1 << 4)
+    driver.execute_script(
+        "macos: keys",
+        {
+            "keys": [
+                {
+                    "key": "g",
+                    "modifierFlags": flagsShift,
+                },
+            ]
+        },
+    )
+    image_path = os.path.join(os.getcwd(), "IMAGE_1.jpg")
+    driver.execute_script(
+        "macos:keys",
+        {"keys": [*image_path, "XCUIKeyboardKeyEnter"]},
+    )
 
     driver.find_element(
         by=AppiumBy.IOS_PREDICATE,
@@ -148,7 +160,8 @@ def test_verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMA
     driver,
 ):
     img1 = Image.open("IMAGE_1.jpg")
-    img2 = Image.open("IMAGE_2.png")
+    img2 = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_2.png"))
+
     img_diff = Image.new("RGBA", img1.size)
     mismatch = pixelmatch(img1, img2, img_diff)
     img_diff.save("IMAGE_1_diff.png")
