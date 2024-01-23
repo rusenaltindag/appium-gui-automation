@@ -20,16 +20,6 @@ def driver(request):
     options = Mac2Options()
     options.bundle_id = "com.apple.Preview"
     drv = webdriver.Remote("http://127.0.0.1:4723", options=options)
-    # None if os.path.exists("output") else os.mkdir("output")
-
-    # Cleanup step: Delete all created images in the output directory at the end
-    # def cleanup():
-    #     for file_name in os.listdir(os.getcwd()):
-    #         if file_name.endswith(".png") or file_name.endswith(".jpg"):
-    #             os.remove(os.path.join(file_name))
-
-    # # Register the cleanup function
-    # request.addfinalizer(cleanup)
     yield drv
     for file_name in os.listdir(os.getcwd()):
         if file_name.endswith(".png") or file_name.endswith(".jpg"):
@@ -42,7 +32,11 @@ def driver(request):
 )
 @allure.description("Open Preview App on MAC")
 def test_open_image_editor(driver):
-    pass
+    status = driver.execute_script(
+        "macos: queryAppState", {"bundleId": "com.apple.Preview"}
+    )
+    # https://developer.apple.com/documentation/xctest/xcuiapplicationstate?language=objc
+    assert status == 4
 
 
 @allure.title("Import Image: IMAGE_1")
