@@ -25,6 +25,17 @@ def driver():
     drv.quit()
 
 
+# Common setup and teardown logic for each test
+def setup_method(self, method):
+    # Add setup logic here, if needed
+    print("set up")
+
+
+def teardown_method(self, method):
+    # Add teardown logic here, if needed
+    print("tear down up")
+
+
 @allure.title(
     "Start any Image Editing application for desktop that can import & export images with different formats (ex. Paint)"
 )
@@ -55,21 +66,13 @@ def test_import_image(driver):
         },
     )
     image_path = os.getcwd() + "/IMAGE_1.png"
-    driver.execute_script("macos:keys", {"keys": [*image_path]})
-    driver.execute_script("macos:keys", {"keys": ["XCUIKeyboardKeyEnter"]})
-    driver.execute_script("macos:keys", {"keys": ["XCUIKeyboardKeyEnter"]})
-
-    # TODO: Verify with image comparison that the imported Image looks correctly in the Image Editor
-    display_image = driver.find_element(
-        by=AppiumBy.IOS_PREDICATE, value="elementType == 46"
+    driver.execute_script(
+        "macos:keys",
+        {"keys": [*image_path, "XCUIKeyboardKeyEnter", "XCUIKeyboardKeyEnter"]},
     )
-    display_image.screenshot("IMAGE_1_preview_ss_element_type.png")
-
-    display_image = driver.find_element(
+    driver.find_element(
         by=AppiumBy.CLASS_NAME, value="XCUIElementTypeImage"
-    )
-
-    display_image.screenshot("IMAGE_1_preview_ss_class_name.png")
+    ).screenshot("IMAGE_1_preview_ss_class_name.png")
 
 
 @allure.title(
@@ -96,31 +99,26 @@ def test_export_func(driver):
     driver.find_element(
         by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
     ).click()
-    export_image = driver.find_element(
+    driver.find_element(
         by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Export…'"
-    )
-    export_image.click()
+    ).click()
 
-    export_image = driver.find_element(
+    # Select Name Section
+    driver.find_element(
         by=AppiumBy.IOS_PREDICATE,
         value="elementType == 49 AND identifier == 'saveAsNameTextField'",
-    )
-    export_image.click()
+    ).click()
 
-    export_image = driver.find_element(
+    driver.find_element(
         by=AppiumBy.IOS_PREDICATE,
         value="elementType == 14 AND identifier == '_NS:120'",
-    )
-    export_image.click()
-    png_image = driver.find_element(
+    ).click()
+    driver.find_element(
         by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'JPEG'"
-    )
-    png_image.click()
-
-    save = driver.find_element(
+    ).click()
+    driver.find_element(
         by=AppiumBy.IOS_PREDICATE, value="elementType == 9 AND identifier == 'OKButton'"
-    )
-    save.click()
+    ).click()
 
 
 @allure.title("Verify that the exported image exists")
