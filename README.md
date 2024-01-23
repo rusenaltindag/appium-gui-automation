@@ -66,18 +66,6 @@ Please make sure that your mac configured for testing Here is the link for XCode
 
 Adjust the capabilities in the test scripts as needed based on your setup.
 
-
-## Resolving Retina Display Challenges in Image Comparison
-### Issue Overview
-The Mac Retina display introduces a challenge when comparing images with their original pixel size. Due to the high pixel density, the captured screenshots may not directly align with their actual pixel values. For instance, a screenshot taken at 200x200 may actually appear as 500x500 due to the Retina display's scaling.
-
-### Problem Statement
-The base images in our repository are standardized at 1920 x 1080. However, attempts to capture screenshots using Appium or manual methods result in images with progressively larger sizes. While resizing the images to match the base image dimensions is a potential solution, it introduces a drawback: pixel values are lost during the process. This discrepancy in pixel values poses a challenge, especially when using tools like pixelmatch for image comparison.
-
-### Solution Approach
-To address this issue, we need a strategy that considers the Retina display's scaling effect while maintaining accurate pixel values for reliable image comparison. Any suggestions or contributions to enhance image handling process are highly appreciated.
-
-### Reference 
-
-https://www.reddit.com/r/mac/comments/991yj4/2018_15_mbp_is_not_2880x1800_its_3360x2100/
-https://github.com/cypress-io/cypress/issues/6485
+## Notes
+- Screenshoted images resize since mac retina causing doubling or tribling the image width and height 
+- 2 different method used in tests, pixelmatch and imagehash 
