@@ -1,7 +1,9 @@
 # Python3 + PyTest
 import pytest
-import time
 import os
+from PIL import Image
+
+from pixelmatch.contrib.PIL import pixelmatch
 
 from appium import webdriver
 
@@ -48,12 +50,11 @@ def test_import_image(driver):
     driver.execute_script("macos:keys", {"keys": ["XCUIKeyboardKeyEnter"]})
     driver.execute_script("macos:keys", {"keys": ["XCUIKeyboardKeyEnter"]})
 
+    # TODO: Verify with image comparison that the imported Image looks correctly in the Image Editor
 
-def verify_that_the_imported_image_looks_correctly_in_the_image_editor(driver):
-    pass
-
-
-def test_export_image_in_JPG_format(driver):
+    driver.find_element(
+        by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
+    ).click()
     export_image = driver.find_element(
         by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Export…'"
     )
@@ -81,9 +82,17 @@ def test_export_image_in_JPG_format(driver):
     save.click()
 
 
-def verify_that_the_exported_image_exists(driver):
+def test_verify_that_the_exported_image_exists(driver):
     assert os.path.exists("IMAGE_1.jpg")
 
 
-def verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMAGE_2(driver):
-    pass
+def test_verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMAGE_2(
+    driver,
+):
+    img1 = Image.open("IMAGE_1.jpg")
+    img2 = Image.open("IMAGE_2.png")
+
+    img_diff = Image.new("RGBA", img1.size)
+    mismatch = pixelmatch(img1, img2, img_diff)
+    assert mismatch == 0
+    img_diff.save("IMAGE_1_diff.png")
