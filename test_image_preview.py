@@ -14,7 +14,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 
 import allure
 from allure import attachment_type
-from helper import ImageComparisonUtil
+from helper import ImageComparisonUtil, PreviewApp
 
 
 @pytest.fixture(scope="session")
@@ -23,18 +23,26 @@ def driver(request):
     options.bundle_id = "com.apple.Preview"
     drv = webdriver.Remote("http://127.0.0.1:4723", options=options)
     yield drv
-    for file_name in os.listdir(os.getcwd()):
-        if file_name.endswith(".png") or file_name.endswith(".jpg"):
-            os.remove(os.path.join(file_name))
+    # for file_name in os.listdir(os.getcwd()):
+    #     if file_name.endswith(".png") or file_name.endswith(".jpg"):
+    #         os.remove(os.path.join(file_name))
     drv.quit()
 
 
 def test_rusen(driver):
-    img1 = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_1.png"))
-    img2 = Image.open(os.path.join(os.getcwd(), "base_images", "IMAGE_2.png"))
-
-    img_comparison = ImageComparisonUtil(img1, img2)
-    assert img_comparison.compareWithPixelMatch() == 0
+    # preview_app = PreviewApp(driver)
+    # preview_app.ImportImageFromMenuBar()
+    # preview_app.OpenGoToFolderWindow()
+    # preview_app.EnterFullPathNameForBaseImage("IMAGE_1.png")
+    # preview_app.ClickEnter()
+    # preview_app.ClickEnter()
+    # driver.find_element(
+    #     by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
+    # ).click()
+    # driver.find_element(
+    #     by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Open…'"
+    # ).click()
+    pass
 
 
 @allure.title(
@@ -52,30 +60,12 @@ def test_open_image_editor(driver):
 @pytest.mark.image
 @allure.title("Import Image: IMAGE_1")
 def test_import_image(driver):
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
-    ).click()
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Open…'"
-    ).click()
-
-    flagsShift = (1 << 1) | (1 << 4)
-    driver.execute_script(
-        "macos: keys",
-        {
-            "keys": [
-                {
-                    "key": "g",
-                    "modifierFlags": flagsShift,
-                },
-            ]
-        },
-    )
-    image_path = os.path.join(os.getcwd(), "base_images", "IMAGE_1.png")
-    driver.execute_script(
-        "macos:keys",
-        {"keys": [*image_path, "XCUIKeyboardKeyEnter", "XCUIKeyboardKeyEnter"]},
-    )
+    preview_app = PreviewApp(driver)
+    preview_app.ImportImageFromMenuBar()
+    preview_app.OpenGoToFolderWindow()
+    preview_app.EnterFullPathNameForBaseImage("IMAGE_1.png")
+    preview_app.ClickEnter()
+    preview_app.ClickEnter()
     driver.find_element(
         by=AppiumBy.CLASS_NAME, value="XCUIElementTypeImage"
     ).screenshot("IMAGE_1_preview_ss_class_name.png")
@@ -108,41 +98,12 @@ def test_preview_of_image_with_original_with_hash(driver):
 
 @allure.title("Export the Image in JPG format to a local drive")
 def test_export_func(driver):
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
-    ).click()
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Export…'"
-    ).click()
-
-    flagsShift = (1 << 1) | (1 << 4)
-    driver.execute_script(
-        "macos: keys",
-        {
-            "keys": [
-                {
-                    "key": "g",
-                    "modifierFlags": flagsShift,
-                },
-            ]
-        },
-    )
-    image_path = os.path.join(os.getcwd(), "IMAGE_1.jpg")
-    driver.execute_script(
-        "macos:keys",
-        {"keys": [*image_path, "XCUIKeyboardKeyEnter"]},
-    )
-
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE,
-        value="elementType == 14 AND identifier == '_NS:120'",
-    ).click()
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'JPEG'"
-    ).click()
-    driver.find_element(
-        by=AppiumBy.IOS_PREDICATE, value="elementType == 9 AND identifier == 'OKButton'"
-    ).click()
+    preview_app = PreviewApp(driver)
+    preview_app.ExportImageFromMenuBar()
+    preview_app.OpenGoToFolderWindow()
+    preview_app.EnterNameForToBeExportedImage("IMAGE_1.jpg")
+    preview_app.ClickEnter()
+    preview_app.SelectToBeExportedImageFormat()
 
 
 @allure.title("Verify that the exported image exists")

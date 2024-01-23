@@ -6,6 +6,8 @@ import imagehash
 from pixelmatch.contrib.PIL import pixelmatch
 import allure
 from allure import attachment_type
+from appium.webdriver.common.appiumby import AppiumBy
+import os
 
 
 class ImageComparisonUtil:
@@ -52,3 +54,72 @@ class ImageComparisonUtil:
 class IOHelper:
     def __init__(self):
         pass
+
+
+class PreviewApp:
+    def __init__(self, driver):
+        self.driver = driver
+
+    def ImportImageFromMenuBar(self):
+        self.driver.find_element(
+            by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
+        ).click()
+        self.driver.find_element(
+            by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Open…'"
+        ).click()
+
+    def ExportImageFromMenuBar(self):
+        self.driver.find_element(
+            by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
+        ).click()
+        self.driver.find_element(
+            by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Export…'"
+        ).click()
+
+    def OpenGoToFolderWindow(self):
+        flagsShift = (1 << 1) | (1 << 4)
+        self.driver.execute_script(
+            "macos: keys",
+            {
+                "keys": [
+                    {
+                        "key": "g",
+                        "modifierFlags": flagsShift,
+                    },
+                ]
+            },
+        )
+
+    def EnterFullPathNameForBaseImage(self, img_name):
+        image_path = os.path.join(os.getcwd(), "base_images", img_name)
+        self.driver.execute_script(
+            "macos:keys",
+            {"keys": [*image_path]},
+        )
+
+    def EnterNameForToBeExportedImage(self, img_name):
+        image_path = os.path.join(os.getcwd(), img_name)
+        self.driver.execute_script(
+            "macos:keys",
+            {"keys": [*image_path]},
+        )
+
+    def SelectToBeExportedImageFormat(self, img_type="JPEG"):
+        self.driver.find_element(
+            by=AppiumBy.IOS_PREDICATE,
+            value="elementType == 14 AND identifier == '_NS:120'",
+        ).click()
+        self.driver.find_element(
+            by=AppiumBy.IOS_PREDICATE,
+            value=f"elementType == 54 AND title == '{img_type}'",
+        ).click()
+        self.driver.find_element(
+            by=AppiumBy.IOS_PREDICATE,
+            value="elementType == 9 AND identifier == 'OKButton'",
+        ).click()
+
+    def ClickEnter(self):
+        self.driver.execute_script(
+            "macos:keys",
+            {"keys": ["XCUIKeyboardKeyEnter"]},
+        )
