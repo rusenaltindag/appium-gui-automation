@@ -37,23 +37,6 @@ def driver(request):
     drv.quit()
 
 
-@pytest.fixture
-def test_environment_setup(request):
-    # Ensure output directory exists
-    pass
-
-
-# Common setup and teardown logic for each test
-def setup_method(self, method):
-    # Add setup logic here, if needed
-    print("set up")
-
-
-def teardown_method(self, method):
-    # Add teardown logic here, if needed
-    print("tear down up")
-
-
 @allure.title(
     "Start any Image Editing application for desktop that can import & export images with different formats (ex. Paint)"
 )
