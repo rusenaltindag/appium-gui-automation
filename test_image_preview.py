@@ -31,6 +31,9 @@ def driver(request):
     # # Register the cleanup function
     # request.addfinalizer(cleanup)
     yield drv
+    for file_name in os.listdir(os.getcwd()):
+        if file_name.endswith(".png") or file_name.endswith(".jpg"):
+            os.remove(os.path.join(file_name))
     drv.quit()
 
 
