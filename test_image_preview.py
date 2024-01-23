@@ -1,19 +1,10 @@
-# Python3 + PyTest
 import pytest
 import os
-import imagehash
 from PIL import Image
-
-from pixelmatch.contrib.PIL import pixelmatch
-
 from appium import webdriver
-
-# Options are available in Python client since v2.6.0
 from appium.options.mac import Mac2Options
-from appium.webdriver.common.appiumby import AppiumBy
 
 import allure
-from allure import attachment_type
 from helper import ImageComparisonUtil, PreviewApp
 
 
@@ -24,26 +15,8 @@ def preview_app(request):
     drv = webdriver.Remote("http://127.0.0.1:4723", options=options)
     app = PreviewApp(drv)
     yield app
-    for file_name in os.listdir(os.getcwd()):
-        if file_name.endswith(".png") or file_name.endswith(".jpg"):
-            os.remove(os.path.join(file_name))
+    app.cleanCreatedScreenShots()
     app.TearDown()
-
-
-def test_rusen(preview_app):
-    # preview_app = PreviewApp(driver)
-    # preview_app.ImportImageFromMenuBar()
-    # preview_app.OpenGoToFolderWindow()
-    # preview_app.EnterFullPathNameForBaseImage("IMAGE_1.png")
-    # preview_app.ClickEnter()
-    # preview_app.ClickEnter()
-    # driver.find_element(
-    #     by=AppiumBy.IOS_PREDICATE, value="elementType == 56 AND title == 'File'"
-    # ).click()
-    # driver.find_element(
-    #     by=AppiumBy.IOS_PREDICATE, value="elementType == 54 AND title == 'Open…'"
-    # ).click()
-    pass
 
 
 @allure.title(
