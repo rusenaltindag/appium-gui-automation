@@ -16,13 +16,28 @@ from allure import attachment_type
 
 
 @pytest.fixture(scope="session")
-def driver():
+def driver(request):
     options = Mac2Options()
     options.bundle_id = "com.apple.Preview"
     drv = webdriver.Remote("http://127.0.0.1:4723", options=options)
-    None if os.path.exists("output") else os.mkdir("output")
+    # None if os.path.exists("output") else os.mkdir("output")
+
+    # Cleanup step: Delete all created images in the output directory at the end
+    # def cleanup():
+    #     for file_name in os.listdir(os.getcwd()):
+    #         if file_name.endswith(".png") or file_name.endswith(".jpg"):
+    #             os.remove(os.path.join(file_name))
+
+    # # Register the cleanup function
+    # request.addfinalizer(cleanup)
     yield drv
     drv.quit()
+
+
+@pytest.fixture
+def test_environment_setup(request):
+    # Ensure output directory exists
+    pass
 
 
 # Common setup and teardown logic for each test
@@ -65,7 +80,7 @@ def test_import_image(driver):
             ]
         },
     )
-    image_path = os.getcwd() + "/IMAGE_1.png"
+    image_path = os.path.join(os.getcwd(), "IMAGE_1.png")
     driver.execute_script(
         "macos:keys",
         {"keys": [*image_path, "XCUIKeyboardKeyEnter", "XCUIKeyboardKeyEnter"]},
@@ -134,7 +149,6 @@ def test_verify_with_image_comparison_whether_the_exported_image_is_equal_to_IMA
 ):
     img1 = Image.open("IMAGE_1.jpg")
     img2 = Image.open("IMAGE_2.png")
-
     img_diff = Image.new("RGBA", img1.size)
     mismatch = pixelmatch(img1, img2, img_diff)
     img_diff.save("IMAGE_1_diff.png")
